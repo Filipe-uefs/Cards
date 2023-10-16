@@ -1,9 +1,7 @@
 package com.cards.enums;
 
-import lombok.Data;
 import lombok.Getter;
 
-import java.util.Objects;
 
 @Getter
 public enum CardEnum {
@@ -29,5 +27,4 @@ public enum CardEnum {
         }
         return null;
     }
-
 }

@@ -15,6 +15,7 @@ public class CardService {
     private final CardRepository cardRepository;
 
     public List<CardModel> saveAll(List<CardModel> cardModels) {
+
         try {
             return cardRepository.saveAll(cardModels);
         } catch (Exception error) {

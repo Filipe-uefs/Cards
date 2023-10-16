@@ -1,6 +1,5 @@
 package com.cards.dto.playerCard;
 
-import com.cards.dto.card.CardResponseDTO;
 import com.cards.dto.card.CardResponseExternalDTO;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;

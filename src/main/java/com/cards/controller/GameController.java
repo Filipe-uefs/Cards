@@ -30,6 +30,7 @@ public class GameController {
         GameResponseDTO responseDTO = gameService.getGameResponseById(gameId);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+
     @GetMapping(value = "/winner/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getWinner(@PathVariable(value = "gameId") String gameId) {
         GameResponseDTO responseDTO = gameService.generateWinner(gameId);

@@ -23,6 +23,7 @@ public class ApiDeckService {
         try {
             url = "https://www.deckofcardsapi.com/api/deck/new/shuffle/";
             return restTemplate.getForObject(url, DeckResponseExternalDTO.class);
+
         } catch (Exception error) {
             String messageError = String.format("Generic error when try call endpoint for create new deck, for url: %s", url);
             throw new BusinessException(messageError, error);
@@ -41,6 +42,7 @@ public class ApiDeckService {
                 return new ArrayList<>();
             }
             return playerCardResponseDTO.getCards();
+
         } catch (Exception error) {
             String messageError = String.format("Generic error when try call endpoint for generate new cards for player, for url: %s", url);
             throw new BusinessException(messageError, error);
