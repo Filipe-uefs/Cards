@@ -33,6 +33,13 @@ public class PlayerController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
+    @PostMapping(value = "/{gameId}/createGenericAllPlayers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> saveAll(@PathVariable String gameId) {
+
+        List<PlayerResponseDTO> responseDTO = playerService.createAllPlayers(gameId);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
     @PostMapping(value = "/{playerId}/createCards", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createCards(@PathVariable UUID playerId) {
 

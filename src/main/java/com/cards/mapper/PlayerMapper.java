@@ -13,6 +13,8 @@ public interface PlayerMapper {
 
     PlayerModel toModel(PlayerRequestDTO playerRequestDTO);
 
+    PlayerModel toModel(PlayerResponseDTO playerResponseDTO);
+
     PlayerResponseDTO toResponse(PlayerModel playerModel);
 
     List<PlayerResponseDTO> toResponseList(List<PlayerModel> playerModels);

@@ -5,6 +5,7 @@ import com.cards.dto.player.PlayerRequestDTO;
 import com.cards.dto.player.PlayerResponseDTO;
 import com.cards.enums.CardEnum;
 import com.cards.enums.LengthLimitPlayersEnum;
+import com.cards.enums.RandomPlayersEnum;
 import com.cards.exception.BusinessException;
 import com.cards.exception.DataNotFoundException;
 import com.cards.exception.InvalidInputException;
@@ -76,22 +77,50 @@ public class PlayerService {
         }
     }
 
+    public List<PlayerResponseDTO> createAllPlayers(String gameId) {
+
+        try {
+            GameModel gameModel = gameService.getGameById(gameId);
+            int sizePlayersRegistered = LengthLimitPlayersEnum.MAX_PLAYER_PER_GAME.getValue() - gameModel.getPlayers().size();
+            List<String> stringNamesForInput = RandomPlayersEnum.generateRandomPlayers(sizePlayersRegistered);
+            stringNamesForInput.forEach(name -> {
+                PlayerRequestDTO playerRequestDTO = new PlayerRequestDTO();
+                playerRequestDTO.setGameId(gameId);
+                playerRequestDTO.setName(name);
+                PlayerModel playerModel = playerMapper.toModel(save(playerRequestDTO));
+                gameModel.getPlayers().add(playerModel);
+            });
+            return playerMapper.toResponseList(gameModel.getPlayers());
+
+        } catch (DataNotFoundException | InvalidInputException error) {
+            throw error;
+
+        } catch (Exception error) {
+            String messageError = String.format("Generic error when try find player, for playerId: %s", gameId);
+            throw new BusinessException(messageError, error);
+        }
+
+    }
     public PlayerResponseDTO createCardsForPlayer(UUID playerId) {
-        //@TODO FAZER SE CARTAS JÀ FORAM CRIADAS PARA PLAYER ID
+
         try{
             PlayerModel playerModel = getPlayerById(playerId);
 
-            List<CardResponseExternalDTO> cardResponseExternalDTOList = apiDeckService.generateCardsForPlayer(playerModel.getGame().getGameId());
-            cardResponseExternalDTOList.forEach(cardResponseExternalDTO -> {
-                CardEnum cardEnum = CardEnum.getCarEnumByName(cardResponseExternalDTO.getValue());
-                if (cardEnum != null) {
-                    cardResponseExternalDTO.setValue(String.valueOf(cardEnum.getValue()));
-                }
-            });
-            playerModel.setCards(cardMapper.toModelList(cardResponseExternalDTOList));
-            List<CardModel> cardModels = playerModel.getCards().stream()
-                    .peek(cardModel -> cardModel.setPlayer(playerModel)).collect(Collectors.toList());
-            cardService.saveAll(cardModels);
+            if (playerModel.getCards().size() != LengthLimitPlayersEnum.MAX_CARDS_PER_PLAYER.getValue()) {
+                List<CardResponseExternalDTO> cardResponseExternalDTOList = apiDeckService.generateCardsForPlayer(playerModel.getGame().getGameId(),
+                        LengthLimitPlayersEnum.MAX_CARDS_PER_PLAYER.getValue() - playerModel.getCards().size());
+                cardResponseExternalDTOList.forEach(cardResponseExternalDTO -> {
+                    CardEnum cardEnum = CardEnum.getCarEnumByName(cardResponseExternalDTO.getValue());
+                    if (cardEnum != null) {
+                        cardResponseExternalDTO.setValue(String.valueOf(cardEnum.getValue()));
+                    }
+                });
+                playerModel.setCards(cardMapper.toModelList(cardResponseExternalDTOList));
+                List<CardModel> cardModels = playerModel.getCards().stream()
+                        .peek(cardModel -> cardModel.setPlayer(playerModel)).collect(Collectors.toList());
+                cardService.saveAll(cardModels);
+            }
+
             return playerMapper.toResponse(playerModel);
 
         } catch (DataNotFoundException error) {
@@ -106,7 +135,6 @@ public class PlayerService {
     public List<PlayerResponseDTO> createAllCardsForPlayers(String gameId) {
 
         try{
-
             GameModel gameModel = gameService.getGameById(gameId);
 
             if (gameModel.getPlayers().size() < LengthLimitPlayersEnum.MAX_PLAYER_PER_GAME.getValue()) {
@@ -115,10 +143,12 @@ public class PlayerService {
                 throw new InvalidInputException(messageError);
             }
             gameModel.getPlayers().forEach(playerModel -> {
-                createCardsForPlayer(playerModel.getPlayerId());
+                if (playerModel.getCards().size() != LengthLimitPlayersEnum.MAX_CARDS_PER_PLAYER.getValue()) {
+                    createCardsForPlayer(playerModel.getPlayerId());
+                }
             });
 
-            return gameService.getGameResponseById(gameId).getPlayers();
+            return playerMapper.toResponseList(gameModel.getPlayers());
 
         } catch (DataNotFoundException |InvalidInputException error) {
             throw error;

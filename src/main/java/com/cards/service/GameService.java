@@ -57,6 +57,7 @@ public class GameService {
     }
 
     public GameModel getGameById(String gameId) {
+
         try {
             return gameRepository.findById(gameId).orElseThrow(DataNotFoundException::new);
         } catch (DataNotFoundException error) {
