@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 public interface GameMapper {
 
     @Mapping(source = "deckId", target = "gameId")
-    GameModel deckExternalResponseToGameModel(DeckResponseExternalDTO deckResponseExternalDTO);
+    GameModel toDeckExternalResponseToGameModel(DeckResponseExternalDTO deckResponseExternalDTO);
 
     GameResponseDTO toResponse(GameModel gameModel);
 }

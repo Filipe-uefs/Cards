@@ -3,6 +3,7 @@ package com.cards.model;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,6 +24,7 @@ public class PlayerModel {
     @GeneratedValue(generator = "UUIDGenerator")
     private UUID playerId;
 
+    @Column(unique = true)
     private String name;
 
     @ManyToOne

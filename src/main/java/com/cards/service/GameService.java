@@ -36,7 +36,7 @@ public class GameService {
     public GameResponseDTO save() {
         try {
             DeckResponseExternalDTO deckResponseExternalDTO = apiDeckService.getNewDeckShuffle();
-            GameModel gameModel = gameRepository.save(gameMapper.deckExternalResponseToGameModel(deckResponseExternalDTO));
+            GameModel gameModel = gameRepository.save(gameMapper.toDeckExternalResponseToGameModel(deckResponseExternalDTO));
             return gameMapper.toResponse(gameModel);
         } catch (Exception error) {
             String messageError = "Generic error when try save new game";

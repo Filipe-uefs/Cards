@@ -42,7 +42,12 @@ public class PlayerService {
 
         try {
             GameModel gameModel = gameService.getGameById(requestDTO.getGameId());
+            List<PlayerModel> playerModel = getPlayersByName(requestDTO.getName(), gameModel);
 
+            if (!playerModel.isEmpty()) {
+                String messageError = String.format("Error when try insert new player, name for player exist, name: %s", requestDTO.getName());
+                throw new InvalidInputException(messageError);
+            }
             if (gameModel.getPlayers().size() == LengthLimitPlayersEnum.MAX_PLAYER_PER_GAME.getValue()) {
                 String messageError = String.format("Error when try insert new player, limit of players exceeded. Limit: %s",
                         LengthLimitPlayersEnum.MAX_PLAYER_PER_GAME.getValue());
@@ -58,6 +63,17 @@ public class PlayerService {
 
         } catch (Exception error) {
             String messageError = String.format("Generic error when try save new player, for playerResquestDTO: %s", requestDTO);
+            throw new BusinessException(messageError, error);
+        }
+    }
+
+    public List<PlayerModel> getPlayersByName(String name, GameModel gameModel) {
+
+        try {
+            return playerRepository.findByNameIgnoreCaseAndGame(name, gameModel);
+
+        } catch (Exception error) {
+            String messageError = String.format("Generic error when try find player, for playerId: %s", name);
             throw new BusinessException(messageError, error);
         }
     }
